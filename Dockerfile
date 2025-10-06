@@ -2,7 +2,7 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
 COPY . .
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 # Etapa 2: runtime (execução)
 FROM eclipse-temurin:21-jdk
