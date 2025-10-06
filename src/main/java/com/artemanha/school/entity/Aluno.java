@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 @Getter
@@ -16,7 +17,10 @@ public class Aluno {
 
     // 🧒 Dados do aluno
     private String nome;
+
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataNascimento;
+
     private String turma;
     private String matricula;
 
