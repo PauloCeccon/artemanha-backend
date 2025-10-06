@@ -21,9 +21,9 @@ public class Turma {
     private String nome;
     private String nomeResumido;
     private String curso;
-    private String periodo;   // manhã/tarde/noite/semestre etc
-    private String situacao;  // ativa, inativa, planejada etc
-    private String turno;     // manhã/tarde/noite
+    private String periodo;
+    private String situacao;
+    private String turno;
 
     private Integer maximoAlunos;
 
