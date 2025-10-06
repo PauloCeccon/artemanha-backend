@@ -4,8 +4,6 @@ services:
     plan: free
     region: virginia
     runtime: docker
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -jar target/*.jar
     dockerfilePath: Dockerfile
     envVars:
       - key: SPRING_DATASOURCE_URL
