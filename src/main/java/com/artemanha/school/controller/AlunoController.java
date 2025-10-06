@@ -40,7 +40,6 @@ public class AlunoController {
     // POST /api/alunos
     @PostMapping
     public ResponseEntity<Aluno> salvar(@RequestBody Aluno aluno) {
-        // ⚙️ Se o front enviar apenas o ID do status, precisamos buscar o objeto completo
         if (aluno.getStatus() != null && aluno.getStatus().getId() != null) {
             Optional<MatriculaStatus> statusOpt = statusRepo.findById(aluno.getStatus().getId());
             statusOpt.ifPresent(aluno::setStatus);
@@ -55,8 +54,20 @@ public class AlunoController {
         return alunoRepo.findById(id).map(alunoExistente -> {
             alunoExistente.setNome(alunoAtualizado.getNome());
             alunoExistente.setTurma(alunoAtualizado.getTurma());
-            alunoExistente.setResponsavel(alunoAtualizado.getResponsavel());
             alunoExistente.setMatricula(alunoAtualizado.getMatricula());
+
+            alunoExistente.setDataNascimento(alunoAtualizado.getDataNascimento());
+            alunoExistente.setPeriodo(alunoAtualizado.getPeriodo());
+            alunoExistente.setAno(alunoAtualizado.getAno());
+            alunoExistente.setHorario(alunoAtualizado.getHorario());
+            alunoExistente.setProfessora(alunoAtualizado.getProfessora());
+            alunoExistente.setAuxiliar(alunoAtualizado.getAuxiliar());
+
+            alunoExistente.setResponsavelPedagogico(alunoAtualizado.getResponsavelPedagogico());
+            alunoExistente.setParentesco(alunoAtualizado.getParentesco());
+            alunoExistente.setEmailResponsavel(alunoAtualizado.getEmailResponsavel());
+            alunoExistente.setTelefone1(alunoAtualizado.getTelefone1());
+            alunoExistente.setTelefone2(alunoAtualizado.getTelefone2());
 
             if (alunoAtualizado.getStatus() != null && alunoAtualizado.getStatus().getId() != null) {
                 Optional<MatriculaStatus> statusOpt = statusRepo.findById(alunoAtualizado.getStatus().getId());
