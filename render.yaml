@@ -1,11 +1,12 @@
 services:
   - type: web
     name: artemanha-backend
-    env: java
     plan: free
     region: virginia
+    runtime: docker
     buildCommand: ./mvnw clean package -DskipTests
     startCommand: java -jar target/*.jar
+    dockerfilePath: Dockerfile
     envVars:
       - key: SPRING_DATASOURCE_URL
         value: jdbc:postgresql://dpg-d3hh3qb3fgac739q64ng-a.virginia-postgres.render.com/artemanha
@@ -19,6 +20,4 @@ services:
         value: true
       - key: SERVER_PORT
         value: 10000
-      - key: JAVA_VERSION
-        value: 21
     healthCheckPath: /health
