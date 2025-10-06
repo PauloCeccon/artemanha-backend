@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: artemanha-backend
+    env: java
+    plan: free
+    region: virginia
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://dpg-d3hh3qb3fgac739q64ng-a.virginia-postgres.render.com/artemanha
+      - key: SPRING_DATASOURCE_USERNAME
+        value: artemanha_user
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: rshuFSDbFwjYZgj2oNgnyHTIFFke1HFy
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: SPRING_JPA_SHOW_SQL
+        value: true
+      - key: SERVER_PORT
+        value: 10000
+      - key: JAVA_VERSION
+        value: 21
+    healthCheckPath: /health
