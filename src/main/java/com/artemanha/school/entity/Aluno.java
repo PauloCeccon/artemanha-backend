@@ -8,13 +8,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Aluno {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
     private String turma;
-    private String email;
     private String responsavel;
     private String matricula;
+
+    // Relacionamento com a tabela matricula_status
+    @ManyToOne
+    @JoinColumn(name = "status_id")
+    private MatriculaStatus status;
 }
