@@ -1,10 +1,12 @@
 package com.artemanha.school.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @Entity
+@Getter
+@Setter
 public class Aluno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,4 +15,6 @@ public class Aluno {
     private String nome;
     private String turma;
     private String email;
+    private String responsavel;
+    private String matricula;
 }
