@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
@@ -42,4 +43,14 @@ public class Aluno {
     @ManyToOne
     @JoinColumn(name = "status_id")
     private MatriculaStatus status;
+
+    // 🕒 Data e hora em que o aluno foi criado
+    @Column(name = "data_criacao", updatable = false)
+    private LocalDateTime dataCriacao;
+
+    // 🔁 Este método é chamado automaticamente antes de inserir o registro no banco
+    @PrePersist
+    protected void aoCriar() {
+        this.dataCriacao = LocalDateTime.now();
+    }
 }
