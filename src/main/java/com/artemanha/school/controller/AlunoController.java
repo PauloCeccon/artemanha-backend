@@ -39,11 +39,16 @@ public class AlunoController {
 
     // POST /api/alunos
     @PostMapping
-    public ResponseEntity<Aluno> salvar(@RequestBody Aluno aluno) {
+    public ResponseEntity<?> salvar(@RequestBody Aluno aluno) {
+        if (aluno.getNome() == null || aluno.getNome().isBlank()) {
+            return ResponseEntity.badRequest().body("Nome do aluno é obrigatório.");
+        }
+
         if (aluno.getStatus() != null && aluno.getStatus().getId() != null) {
             Optional<MatriculaStatus> statusOpt = statusRepo.findById(aluno.getStatus().getId());
             statusOpt.ifPresent(aluno::setStatus);
         }
+
         Aluno salvo = alunoRepo.save(aluno);
         return ResponseEntity.ok(salvo);
     }

@@ -19,7 +19,7 @@ public class Aluno {
     // 🧒 Dados do aluno
     private String nome;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern = "dd/MM/yyyy", shape = JsonFormat.Shape.STRING)
     private LocalDate dataNascimento;
 
     private String turma;
@@ -48,7 +48,6 @@ public class Aluno {
     @Column(name = "data_criacao", updatable = false)
     private LocalDateTime dataCriacao;
 
-    // 🔁 Este método é chamado automaticamente antes de inserir o registro no banco
     @PrePersist
     protected void aoCriar() {
         this.dataCriacao = LocalDateTime.now();
