@@ -19,7 +19,7 @@ public class Aluno {
     // 🧒 Dados do aluno
     private String nome;
 
-    @JsonFormat(pattern = "dd/MM/yyyy", shape = JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
     private LocalDate dataNascimento;
 
     private String turma;
