@@ -1,5 +1,6 @@
 package com.artemanha.school.controller;
 
+import com.artemanha.school.dto.AlunoComTurmaDTO;
 import com.artemanha.school.entity.Aluno;
 import com.artemanha.school.entity.MatriculaStatus;
 import com.artemanha.school.repository.AlunoRepository;
@@ -23,21 +24,23 @@ public class AlunoController {
         this.statusRepo = statusRepo;
     }
 
-    // GET /api/alunos
+    // ✅ LISTA todos os alunos com nome da turma e ID da matrícula
     @GetMapping
-    public List<Aluno> listar() {
-        return alunoRepo.findAll();
+    public List<AlunoComTurmaDTO> listar() {
+        return alunoRepo.findAllWithTurma();
     }
 
-    // GET /api/alunos/{id}
+    // ✅ Busca aluno por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Aluno> buscarPorId(@PathVariable Long id) {
-        Optional<Aluno> aluno = alunoRepo.findById(id);
-        return aluno.map(ResponseEntity::ok)
+    public ResponseEntity<AlunoComTurmaDTO> buscarPorId(@PathVariable Long id) {
+        return alunoRepo.findAllWithTurma().stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst()
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/alunos
+    // ✅ Cria novo aluno
     @PostMapping
     public ResponseEntity<?> salvar(@RequestBody Aluno aluno) {
         if (aluno.getNome() == null || aluno.getNome().isBlank()) {
@@ -53,21 +56,17 @@ public class AlunoController {
         return ResponseEntity.ok(salvo);
     }
 
-    // PUT /api/alunos/{id}
+    // ✅ Atualiza dados básicos do aluno
     @PutMapping("/{id}")
     public ResponseEntity<Aluno> atualizar(@PathVariable Long id, @RequestBody Aluno alunoAtualizado) {
         return alunoRepo.findById(id).map(alunoExistente -> {
             alunoExistente.setNome(alunoAtualizado.getNome());
-            alunoExistente.setTurma(alunoAtualizado.getTurma());
-            alunoExistente.setMatricula(alunoAtualizado.getMatricula());
-
             alunoExistente.setDataNascimento(alunoAtualizado.getDataNascimento());
             alunoExistente.setPeriodo(alunoAtualizado.getPeriodo());
             alunoExistente.setAno(alunoAtualizado.getAno());
             alunoExistente.setHorario(alunoAtualizado.getHorario());
             alunoExistente.setProfessora(alunoAtualizado.getProfessora());
             alunoExistente.setAuxiliar(alunoAtualizado.getAuxiliar());
-
             alunoExistente.setResponsavelPedagogico(alunoAtualizado.getResponsavelPedagogico());
             alunoExistente.setParentesco(alunoAtualizado.getParentesco());
             alunoExistente.setEmailResponsavel(alunoAtualizado.getEmailResponsavel());
@@ -84,7 +83,7 @@ public class AlunoController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/alunos/{id}
+    // ✅ Exclui aluno
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         if (!alunoRepo.existsById(id)) {

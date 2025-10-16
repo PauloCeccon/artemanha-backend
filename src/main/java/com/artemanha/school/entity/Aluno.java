@@ -22,9 +22,6 @@ public class Aluno {
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
     private LocalDate dataNascimento;
 
-    private String turma;
-    private String matricula;
-
     // 🎓 Acadêmico
     private String periodo;
     private String ano;

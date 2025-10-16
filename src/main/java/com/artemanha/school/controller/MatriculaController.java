@@ -1,4 +1,3 @@
-// src/main/java/com/artemanha/school/controller/MatriculaController.java
 package com.artemanha.school.controller;
 
 import com.artemanha.school.entity.Aluno;
@@ -35,6 +34,8 @@ public class MatriculaController {
         this.turmaRepo = turmaRepo;
     }
 
+    /* =================== ENDPOINTS =================== */
+
     @GetMapping
     public Iterable<Matricula> listar() {
         return matriculaRepo.findAll();
@@ -42,7 +43,8 @@ public class MatriculaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Matricula> buscar(@PathVariable Long id) {
-        return matriculaRepo.findById(id).map(ResponseEntity::ok)
+        return matriculaRepo.findById(id)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -59,7 +61,6 @@ public class MatriculaController {
             return ResponseEntity.badRequest().body("Aluno ou Turma inválidos.");
         }
 
-        // Situação: default "Ativa" se não enviada
         MatriculaSituacao situacaoAtiva = situacaoRepo
                 .findByDescricaoIgnoreCase("Ativa")
                 .orElseThrow();
@@ -70,17 +71,18 @@ public class MatriculaController {
         }
         if (situacao == null) situacao = situacaoAtiva;
 
-        // Checa duplicidade de matrícula ATIVA do mesmo aluno na mesma turma
+        // Evita duplicidade de matrícula ATIVA do mesmo aluno na mesma turma
         if (situacao.getId().equals(situacaoAtiva.getId()) &&
                 matriculaRepo.existsByAluno_IdAndTurma_IdAndSituacao_Id(
                         alunoOpt.get().getId(), turmaOpt.get().getId(), situacaoAtiva.getId())) {
             return ResponseEntity.status(409).body("Aluno já possui matrícula ATIVA nesta turma.");
         }
 
-        // Capacidade
+        // Checa capacidade da turma
         Integer max = turmaOpt.get().getMaximoAlunos();
         if (max != null && max > 0 && situacao.getId().equals(situacaoAtiva.getId())) {
-            long ocupadas = matriculaRepo.countByTurma_IdAndSituacao_Id(turmaOpt.get().getId(), situacaoAtiva.getId());
+            long ocupadas = matriculaRepo.countByTurma_IdAndSituacao_Id(
+                    turmaOpt.get().getId(), situacaoAtiva.getId());
             if (ocupadas >= max) {
                 return ResponseEntity.unprocessableEntity().body("Turma sem vagas.");
             }
@@ -96,10 +98,6 @@ public class MatriculaController {
         m.setObservacoes(req.getObservacoes());
 
         Matricula salvo = matriculaRepo.save(m);
-
-        // 🔄 Sincroniza perfil do aluno com esta matrícula
-        aplicarMatriculaNoPerfilAluno(salvo);
-
         return ResponseEntity.created(URI.create("/api/matriculas/" + salvo.getId())).body(salvo);
     }
 
@@ -124,86 +122,17 @@ public class MatriculaController {
             if (req.getObservacoes() != null) m.setObservacoes(req.getObservacoes());
 
             Matricula salvo = matriculaRepo.save(m);
-
-            // 🔄 Reaplica no perfil do aluno (caso turma/situação tenham mudado)
-            aplicarMatriculaNoPerfilAluno(salvo);
-
             return ResponseEntity.ok(salvo);
+
         }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluir(@PathVariable Long id) {
-        Optional<Matricula> opt = matriculaRepo.findById(id);
-        if (opt.isEmpty()) return ResponseEntity.notFound().build();
-
-        Matricula existente = opt.get();
-        Long alunoId = existente.getAluno() != null ? existente.getAluno().getId() : null;
-
+        if (!matriculaRepo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
         matriculaRepo.deleteById(id);
-
-        // 🔄 Se o aluno estava "apontando" para esta matrícula, ajusta/limpa
-        if (alunoId != null) {
-            aposExcluirMatricula(existente);
-        }
-
         return ResponseEntity.noContent().build();
-    }
-
-    /* ================= HELPERs ================= */
-
-    /** Aplica/retira a matrícula no perfil do aluno conforme situação. */
-    private void aplicarMatriculaNoPerfilAluno(Matricula m) {
-        if (m.getAluno() == null) return;
-
-        Aluno a = alunoRepo.findById(m.getAluno().getId()).orElse(null);
-        if (a == null) return;
-
-        boolean ativa = m.getSituacao() != null &&
-                "Ativa".equalsIgnoreCase(m.getSituacao().getDescricao());
-
-        if (ativa) {
-            // Coloca turma (nome) e id da matrícula
-            a.setTurma(m.getTurma() != null ? m.getTurma().getNome() : null);
-            a.setMatricula(m.getId() != null ? String.valueOf(m.getId()) : null);
-            alunoRepo.save(a);
-            return;
-        }
-
-        // Se não está ativa e o aluno aponta para esta matrícula, tenta achar outra ATIVA
-        if (m.getId() != null && String.valueOf(m.getId()).equals(a.getMatricula())) {
-            matriculaRepo.findFirstByAluno_IdAndSituacao_DescricaoIgnoreCaseOrderByDataMatriculaDesc(
-                            a.getId(), "Ativa")
-                    .ifPresentOrElse(ativaOutra -> {
-                        a.setTurma(ativaOutra.getTurma() != null ? ativaOutra.getTurma().getNome() : null);
-                        a.setMatricula(String.valueOf(ativaOutra.getId()));
-                        alunoRepo.save(a);
-                    }, () -> {
-                        a.setTurma(null);
-                        a.setMatricula(null);
-                        alunoRepo.save(a);
-                    });
-        }
-    }
-
-    /** Ao excluir uma matrícula, se o aluno apontava para ela, reatribui outra ATIVA ou limpa. */
-    private void aposExcluirMatricula(Matricula excluida) {
-        if (excluida.getAluno() == null) return;
-        Aluno a = alunoRepo.findById(excluida.getAluno().getId()).orElse(null);
-        if (a == null) return;
-
-        if (excluida.getId() != null && String.valueOf(excluida.getId()).equals(a.getMatricula())) {
-            matriculaRepo.findFirstByAluno_IdAndSituacao_DescricaoIgnoreCaseOrderByDataMatriculaDesc(
-                            a.getId(), "Ativa")
-                    .ifPresentOrElse(ativaOutra -> {
-                        a.setTurma(ativaOutra.getTurma() != null ? ativaOutra.getTurma().getNome() : null);
-                        a.setMatricula(String.valueOf(ativaOutra.getId()));
-                        alunoRepo.save(a);
-                    }, () -> {
-                        a.setTurma(null);
-                        a.setMatricula(null);
-                        alunoRepo.save(a);
-                    });
-        }
     }
 }
