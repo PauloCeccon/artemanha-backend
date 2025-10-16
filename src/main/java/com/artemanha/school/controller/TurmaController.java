@@ -19,27 +19,27 @@ public class TurmaController {
         this.turmaRepo = turmaRepo;
     }
 
-    // GET /api/turmas
+    // ✅ GET /api/turmas
     @GetMapping
     public List<Turma> listar() {
         return turmaRepo.findAll();
     }
 
-    // GET /api/turmas/{id}
+    // ✅ GET /api/turmas/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Turma> buscarPorId(@PathVariable Long id) {
         Optional<Turma> turma = turmaRepo.findById(id);
         return turma.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/turmas
+    // ✅ POST /api/turmas
     @PostMapping
     public ResponseEntity<Turma> salvar(@RequestBody Turma turma) {
         Turma salva = turmaRepo.save(turma);
         return ResponseEntity.ok(salva);
     }
 
-    // PUT /api/turmas/{id}
+    // ✅ PUT /api/turmas/{id}
     @PutMapping("/{id}")
     public ResponseEntity<Turma> atualizar(@PathVariable Long id, @RequestBody Turma atualizada) {
         return turmaRepo.findById(id).map(existente -> {
@@ -52,12 +52,20 @@ public class TurmaController {
             existente.setMaximoAlunos(atualizada.getMaximoAlunos());
             existente.setInicio(atualizada.getInicio());
             existente.setTermino(atualizada.getTermino());
+
+            // ✅ novos campos
+            existente.setHorarioInicio(atualizada.getHorarioInicio());
+            existente.setHorarioFim(atualizada.getHorarioFim());
+            existente.setAno(atualizada.getAno());
+            existente.setProfessora(atualizada.getProfessora());
+            existente.setAuxiliar(atualizada.getAuxiliar());
+
             Turma salvo = turmaRepo.save(existente);
             return ResponseEntity.ok(salvo);
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/turmas/{id}
+    // ✅ DELETE /api/turmas/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         if (!turmaRepo.existsById(id)) {

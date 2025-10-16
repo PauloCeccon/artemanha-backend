@@ -19,11 +19,15 @@ public class Turma {
 
     // Dados principais
     private String nome;
+
+    @Column(name = "nome_resumido")
     private String nomeResumido;
+
     private String curso;
     private String situacao;
     private String turno;
 
+    @Column(name = "maximo_alunos")
     private Integer maximoAlunos;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
@@ -32,13 +36,22 @@ public class Turma {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate termino;
 
-    // Campos adicionados para compatibilidade com a query e DTO
+    // Campos adicionais (mapeados corretamente para snake_case no banco)
+    @Column(name = "professora")
     private String professora;
+
+    @Column(name = "auxiliar")
     private String auxiliar;
 
+    @Column(name = "horario_inicio")
     private String horarioInicio;
+
+    @Column(name = "horario_fim")
     private String horarioFim;
 
+    @Column(name = "periodo")
     private String periodo;
+
+    @Column(name = "ano")
     private String ano;
 }
