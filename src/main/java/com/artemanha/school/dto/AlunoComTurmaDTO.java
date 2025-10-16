@@ -2,25 +2,31 @@ package com.artemanha.school.dto;
 
 import com.artemanha.school.entity.MatriculaStatus;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class AlunoComTurmaDTO {
-
     private Long id;
     private String nome;
     private LocalDate dataNascimento;
+
     private String turma;
     private String matricula;
-    private String periodo;
-    private String ano;
-    private String horario;
+
+    // Campos vindos da turma
     private String professora;
     private String auxiliar;
+    private String horarioInicio;
+    private String horarioFim;
+    private String periodo;
+    private String ano;
+
     private String responsavelPedagogico;
     private String parentesco;
     private String emailResponsavel;

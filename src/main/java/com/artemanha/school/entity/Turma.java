@@ -21,7 +21,6 @@ public class Turma {
     private String nome;
     private String nomeResumido;
     private String curso;
-    private String periodo;
     private String situacao;
     private String turno;
 
@@ -32,4 +31,14 @@ public class Turma {
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate termino;
+
+    // Campos adicionados para compatibilidade com a query e DTO
+    private String professora;
+    private String auxiliar;
+
+    private String horarioInicio;
+    private String horarioFim;
+
+    private String periodo;
+    private String ano;
 }

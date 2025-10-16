@@ -40,7 +40,7 @@ public class AlunoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ✅ Cria novo aluno
+    // Cria novo aluno
     @PostMapping
     public ResponseEntity<?> salvar(@RequestBody Aluno aluno) {
         if (aluno.getNome() == null || aluno.getNome().isBlank()) {
@@ -62,11 +62,6 @@ public class AlunoController {
         return alunoRepo.findById(id).map(alunoExistente -> {
             alunoExistente.setNome(alunoAtualizado.getNome());
             alunoExistente.setDataNascimento(alunoAtualizado.getDataNascimento());
-            alunoExistente.setPeriodo(alunoAtualizado.getPeriodo());
-            alunoExistente.setAno(alunoAtualizado.getAno());
-            alunoExistente.setHorario(alunoAtualizado.getHorario());
-            alunoExistente.setProfessora(alunoAtualizado.getProfessora());
-            alunoExistente.setAuxiliar(alunoAtualizado.getAuxiliar());
             alunoExistente.setResponsavelPedagogico(alunoAtualizado.getResponsavelPedagogico());
             alunoExistente.setParentesco(alunoAtualizado.getParentesco());
             alunoExistente.setEmailResponsavel(alunoAtualizado.getEmailResponsavel());
